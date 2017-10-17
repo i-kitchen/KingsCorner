@@ -25,3 +25,16 @@ It may also happen that one of the dealt foundation cards will immediately fit o
 If the center stock runs out, play continues without drawing.
 
 The play ends when someone manages to get rid of all the cards from their hand, or when a stalemate is reached where the stock has run out and everyone is unable or unwilling to play any further cards. 
+
+Rules from https://www.pagat.com/layout/kingscorners.html
+
+
+
+# Architecture
+
+* Layered approach
+  * Data layer - Handles transactions with the database
+  * Application layer - Main game logic. Contains the methods for generating new games, shuffling/dealing cards, determing valid moves, etc.
+  * Presentaion layer - Creates the view for the player. Generates and displays SVG graphics, chat room, game lobby, etc.
+* React for view
+* Redux for state
