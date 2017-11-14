@@ -32,9 +32,8 @@ Rules from https://www.pagat.com/layout/kingscorners.html
 
 # Architecture
 
-* Layered approach
-  * Data layer - Handles transactions with the database
-  * Application layer - Main game logic. Contains the methods for generating new games, shuffling/dealing cards, determing valid moves, etc.
-  * Presentaion layer - Creates the view for the player. Generates and displays SVG graphics, chat room, game lobby, etc.
-* React for view
-* Redux for state
+* Using JavaScript for front and backend. NodeJS will handle the server side code and will be separated into 3 main parts:
+  * Messaging - this handles the chat and console functionality
+  * Game - this is where the game logic and components are stored
+  * Public - this is the presentation elements/client facing code
+
