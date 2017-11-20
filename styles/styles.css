@@ -1,8 +1,214 @@
 body {
-  font-family: 'Lora', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  position: relative;
-  width: 100%;
-  height: 100%;
-  color: white;
-  background-color: black;
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    background-image: url('../img/stonehaven.png');
+}
+
+.header {
+    width: 100%;
+    display: block;
+    margin: auto;
+    text-align: center;
+}
+
+.vcenter {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.floatr {
+    float: right;
+}
+
+/***** FORM BOX *****/
+
+/* Bordered form */
+form {
+    width: 100%;
+    display: block;
+    background-color: #fff;
+}
+  form.login {
+    border: 3px solid #f1f1f1;
+    border-radius: 5px;
+  }
+
+/* half-width inputs */
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Set a style for all buttons */
+button {
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    background-color: #4CAF50;
+}
+
+.loginBtn {
+    width: 100%;
+}
+
+.cancelBtn {
+    background-color: #af4e4c;
+    margin-left: 10px;
+}
+
+.newTransBtn {
+    width: 20%;
+    margin: auto;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+/* Add a hover effect for buttons */
+button:hover {
+    opacity: 0.8;
+}
+
+/* Add padding to containers */
+.container {
+    padding: 16px;
+}
+
+/***** TABLE STYLING *****/
+
+.newTransBtnBox {
+    display: block;
+    width: 90%;
+    margin: auto;
+}
+
+#transactions {
+    display: block;
+    width: 90%;
+    margin: auto;
+    overflow: auto;
+    height: 550px;
+}
+
+/* Base table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Every other row is darkened */
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+/* Set style for all td and th elements */
+td, th {
+    border: 1px solid black;
+    text-align: left;
+    max-width: 200px;
+    word-wrap: break-word;
+    padding: 4px;
+}
+
+/* Set background for headers explicitly */
+th {
+    background-color: #a6d8a8;
+}
+
+/***** MODAL *****/
+
+/* Modal background */
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Modal Content/Box - also used for the trans table loader */
+.modalContent,
+#transLoader {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 15px;
+}
+  #transLoader {
+    width: 20%;
+    display: block;
+    margin: auto;
+  }
+
+.modalLoader {
+    width: 25%;
+}
+
+.modalForm {
+    width: 35%;
+}
+
+/***** SPINNY LOADER *****/
+.loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #4CAF50;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+    text-align: center;
+}
+
+/***** NOTIFICATIONS *****/
+
+.alert {
+    padding: 20px;
+    background-color: #f44336;
+    color: white;
+    opacity: 1;
+    transition: opacity 0.6s;
+    margin-bottom: 15px;
+}
+
+.alert.success {background-color: #4CAF50;}
+
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.closebtn:hover {
+    color: black;
 }
