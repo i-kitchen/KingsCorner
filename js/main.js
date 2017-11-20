@@ -2,7 +2,9 @@ var socket;
 var host = "ws://serenity.ist.rit.edu:9000/442/proj/serviceLayer"
 
 $(document).ready(function() {
-    connect();
+    if(isWebSocketSupported()) {
+        connect();
+    }
 });
 
 function connect() {
