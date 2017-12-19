@@ -1,8 +1,22 @@
 <?php
-    //include all template files
-    //foreach (glob("./templates/*.php") as $filename){
-    //    include $filename;
-    //}
+    session_start();
+
+    require_once('./templates/TemplateEngine.php');
+
+    $html;
+    $onScreen;
+
+    if(isset($_SESSION["loggedIn"])) {
+        $template = new Template('./templates/gameArea.tpl');
+        $html = $template->output();
+        $onScreen = 'board';
+    }
+    else {
+        // Display login template
+        $template = new Template('./templates/login.tpl');
+        $html = $template->output();
+        $onScreen = 'login';
+    }
 ?>
 <!DOCTYPE html>
 <html lang='en'>
@@ -13,29 +27,23 @@
 
     <!-- Styling -->
     <link rel="stylesheet" type="text/css" href="styles/styles.css">
+    <script type="text/javascript">
+        var onScreen = '<?php echo $onScreen; ?>';
+    </script>
 
 </head>
 <body>
 
-    <div id="login" class="vcenter">
-        <div class="header">
-            <h2>Kings Corners</h2>
-        </div>
-        <form class="login" onsubmit="return validateLogin(this);">
-
-            <div class="container">
-                <label><b>Who is playing?</b></label>
-                <input type="text" placeholder="Enter Username" name="uname" required>
-
-                <button type="submit" class="loginBtn">Join</button>
-            </div>
-
-        </form>
-    </div>
+    <?php echo $html; ?>
 
     <!-- Scripts -->
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="vendor/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="vendor/snap.svg-min.js"></script>
     <script type="text/javascript" src="js/Socket.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/gameFunctions.js"></script>
+    <script type="text/javascript" src="js/objects/gameControls.js"></script>
+    <script type="text/javascript" src="js/objects/foundations.js"></script>
+    <script type="text/javascript" src="js/objects/card.js"></script>
 </body>
 </html>

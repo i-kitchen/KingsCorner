@@ -5,14 +5,53 @@
  *****************************************************************************/
 
 require_once("../dataLayer/DB.class.php");
+require_once("../bizLayer/Deck.class.php");
 
-function init($user, $msg) {
-    // Set user's game id
-    $user->gameId = $msg['gameId'];
+$db = new DB();
 
-    // Set user into db
+function init($user, $msg, $socket) {
+    global $db;
+    // Create a deck
+    $gameDeck = new Deck();
+    $deckString = $gameDeck->deckToString();
 
-    // Set user's opponents
+    // Create a game instance in the db
+    $result = $db->createGame($user->userId, $deckString, $gameDeck->hand1, $gameDeck->hand2, $gameDeck->north, $gameDeck->south, $gameDeck->east, $gameDeck->west);
+
+    // Update user entry to include game id as well as user's websocket id
+    $numRows = $db->updateUser((int)$user->userId, $user->id, (int)$result);
+
+    // Return deck and card layouts to client
+    $returnData = array(
+        'deck'  => $gameDeck->deck,
+        'hand'  => $gameDeck->hand1,
+        'north' => $gameDeck->north,
+        'south' => $gameDeck->south,
+        'east'  => $gameDeck->east,
+        'west'  => $gameDeck->west,
+        'error' => $result
+    );
+
+    $socket->sendMessage($user, $returnData);
+}
+
+function nextTurn($user, $data, $socket) {
+    global $db;
+    $numRows = $db->changeTurn($data);
+
+    $message = 'error';
+
+    if($numRows > 0) {
+        $message = 'success';
+    }
+
+    $socket->sendMessage($user, $message);
+}
+
+function createUser($uname, $socketId) {
+    global $db;
+
+    $result = $db->createUser($uname, $socketId);
 }
 
 ?>

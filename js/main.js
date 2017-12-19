@@ -1,20 +1,96 @@
 var socket;
+var cardsSvg;
+var gameBoard;
+var userId;
+var snap;
+
+// Paths
 var host = "ws://serenity.ist.rit.edu:9000/442/proj/serviceLayer"
+var loginUrl = "./bizLayer/Authenticate.php";
+var templateUrl = "./bizLayer/TemplateController.php";
 
 $(document).ready(function() {
-    // if(isWebSocketSupported()) {
-    //     Socket.connect();
-    // }
+    if(isWebSocketSupported()) {
+        if(onScreen == 'login') {
+            // do stuff
+        }
+        else {
+            // Connect to WS server
+            Socket.connect();
+
+            // Set user's id
+            userId = getCookie('uname');
+
+            // Set the snap obj
+            snap = Snap(document.getElementsByTagName('svg')[0]);
+
+            // Initialize game controls
+            $('#logout').on('click', gameControls.logout);
+            $('#createGame').on('click', gameControls.createGame);
+        }
+    }
+    else {
+        // Display not supported error
+        $('body').html("<h1>GET A BETTER BROWSER</h1>");
+    }
 });
 
-function validateLogin(loginForm) {
-    var form = $(loginForm);
+function onConnected() {
+    
+}
 
-    // Display authenticating modal
-    displayModal(false, false, '<div class="loader"></div><div class="loadingText">Authenticating...</div>', 'modalLoader');
+/**
+ * Sends request to initiate user
+ * 
+ * @param loginForm - the username form element
+ * @return false to prevent default form submission
+ */
+function validateLogin(loginForm) {
+    //displayModal(false, false, '<div class="loader"></div><div class="loadingText">Authenticating...</div>', 'modalLoader');
+
+    // Get form submission elements
+    var form = $(loginForm);
+    var user = encodeURI(form.find('input[name=uname]').val());
+    var pass = encodeURI(form.find('input[name=psw]').val());
+
+    // Send ajax request for login confirmation
+    requestData(loginUrl, {command: 'login', user: user, password: pass}, function(res) {
+        var response = JSON.parse(res);
+
+        if(response.user != 'error') {
+            console.log(res);
+
+            // Connect to the websocket server
+            Socket.connect();
+
+            userId = response.id;
+
+            // Get the game board
+            requestData(templateUrl, {template: '../templates/gameArea.tpl'}, function(res) {
+                $('body').html(res);
+
+                // Set welcome message
+                $('#usersName').text(getCookie('uname'));
+            });
+        }
+        else {
+            // Close modal and display error
+            displayModal(true);
+            addNotification(false, 'body', response.reason);
+
+            // Clear inputs
+            var form = $(loginForm);
+            form.find('input[name=uname]').val('');
+            form.find('input[name=psw]').val('');
+        }
+    });
 
     // Prevent default submission
     return false;
+}
+
+function gameInit(message) {
+    console.log(message);
 }
 
 /**
@@ -23,18 +99,18 @@ function validateLogin(loginForm) {
  * @param params - Data to pass in the request
  * @param doneFunct - Function to be called when a response is given
  */
-function requestData(dest, params, doneFunct) {
+function requestData(destination, params, doneFunct) {
     $.ajax({
-        url: dest,
+        url: destination,
         method:"GET",
         data: params
     }).done(function(data) {
         // console.log(data);
         try {
-            var response = JSON.parse(data);
+            //var response = JSON.parse(data);
 
             // Call the finish function
-            doneFunct(response);
+            doneFunct(data);
         } catch(e) {
             // Close any modals
             displayModal(true, false);
@@ -119,7 +195,7 @@ function displayModal(remove, slide, content, modalClass, closable, header) {
 }
 
 /**
- * Adds a notiication to the desired area
+ * Adds a notification to the desired area
  * 
  * @param dismiss - true if we just want to remove the notification
  * @param area - the element where we want to put the notification
@@ -144,3 +220,96 @@ function addNotification(dismiss, area, text, severity) {
         $(".alert").remove();
     }
 }
+
+/**
+ * Sets a new cookie or overwrites one of the same name
+ * 
+ * @param name - the name of the cookie
+ * @param value - what the cookie should contain
+ * @param hours - the amount of hours before the cookie expires
+ */
+function setCookie(name, value, hours)
+{
+    // Calculate the expire time
+    var d = new Date();
+    d.setTime(d.getTime() + (hours*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+
+    // Set the cookie
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+/**
+ * Gets a cookie from the cookie string
+ * 
+ * @param name - the name of the cookie requested
+ * @return - The value of the cookie with the matching name or an empty string
+ *           if not found
+ */
+function getCookie(name)
+{
+    var name = name + "=";
+
+    // Get cookie string and split it up by cookie
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+
+    // Loop through all cookies
+    for(var i = 0; i < ca.length; i++)
+    {
+        var cookie = ca[i];
+        while(cookie.charAt(0) == ' ')
+        {
+            cookie = cookie.substring(1);
+        }
+
+        // IF we find a match, return the value of that cookie
+        if(cookie.indexOf(name) == 0)
+        {
+            return cookie.substring(name.length, cookie.length);
+        }
+    }
+    return "";
+}
+
+/**
+ * Snap hover-over plugin written by Serdar Sanri
+ * https://codepen.io/ssanri/pen/yaPoYk?editors=0010
+ * https://github.com/adobe-webplatform/Snap.svg/issues/285
+ */
+Snap.plugin(function(Snap, Element, Paper, global, Fragment) {
+  Element.prototype.checkUnder = function(query, overCallback, afterCallback) {
+    var that = this;
+    var gABox = this.getBBox();
+    var isOver = 0;
+    var snapElUnder = false;
+    var others = Snap.selectAll(query);
+    others.forEach(function(box) { // Snap.selectAll returns a set
+      var gBBox = box.getBBox();
+      if (gABox && gBBox && Snap.path.isBBoxIntersect(gABox, gBBox) && box.id != that.id) { // box.id!=that.id added so it won't look for self.
+        snapElUnder = Snap(box);
+        isOver = 1;
+      }
+    });
+
+    if (isOver && snapElUnder) {
+      if (typeof this.data('isOver') === 'undefined') {
+        if (typeof overCallback != "undefined") {
+          overCallback.call(this, snapElUnder);
+          this.data('isOver', snapElUnder);
+          // also let's add the event handler disabled in original code so we can listen
+          eve("snap.drag.over." + this.id, this, snapElUnder);
+        }
+      }
+    } else {
+      if (typeof this.data('isOver') !== 'undefined') {
+        if (typeof overCallback != "undefined" && typeof afterCallback != "undefined") {
+          afterCallback.call(this, this.data('isOver'));
+          this.removeData('isOver');
+          // and is out listener
+          eve("snap.drag.out." + this.id, this, snapElUnder);
+        }
+      }
+    }
+  }
+});

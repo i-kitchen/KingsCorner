@@ -4,12 +4,14 @@ class WebSocketUser {
 
   public $socket;
   public $id;
+  public $userId;
   public $gameId;
+  public $currentCallback;
   public $headers = array();
   public $handshake = false;
 
   // Store the user's opponents
-  public $opponents = array();
+  public $opponents;
 
   public $handlingPartialPacket = false;
   public $partialBuffer = "";

@@ -99,6 +99,7 @@ Socket.connect = function() {
         
         // Makes the callback any time a message is received.
         Socket.connection.onmessage = function(event) {
+            console.log(event);
             var message = jQuery.parseJSON(event.data);
             window[message.callback](message);
         }
